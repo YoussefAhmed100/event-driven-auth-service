@@ -15,6 +15,9 @@ import type { LoginDto } from './dto/login.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { generateToken } from 'src/common/utils/generate-token';
 import { RegisterDto } from './dto/register.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserCreatedEvent } from 'src/events/user-created.event';
+import { AUTH_EVENTS } from 'src/events/user.events';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +25,7 @@ export class AuthService {
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: IUsersRepository,
     private readonly jwtService: JwtService,
+     private readonly eventEmitter: EventEmitter2
   ) {}
 
   async register(dto: RegisterDto): Promise<UserResponseDto> {
@@ -39,6 +43,14 @@ export class AuthService {
     });
 
     const token = generateToken(user._id.toString(), this.jwtService);
+      this.eventEmitter.emit(
+     AUTH_EVENTS.USER_REGISTERED,
+    new UserCreatedEvent(
+      user._id.toString(),
+      user.email,
+      user.fullName,
+    ),
+  );
 
     return UserResponseDto.fromEntity(user, token);
   }

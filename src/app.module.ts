@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation';
@@ -50,6 +51,7 @@ import { NotificationModule } from './notification/notification.module';
       ttl: 60,
       isGlobal: true,
     }),
+    EventEmitterModule.forRoot(),
 
     AuthModule,
     UserModule,
