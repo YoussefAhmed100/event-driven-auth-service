@@ -12,12 +12,12 @@ import { NotificationsGateway } from './notifications.gateway';
       { name: Notification.name, schema: NotificationSchema },
     ]),
        JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY,  // ← المهم دي
+      secret: process.env.JWT_SECRET_KEY,  
       signOptions: { expiresIn: '7d' },
     })
   ],
   providers: [NotificationsService, NotificationsGateway],
   controllers: [NotificationsController],
-  exports: [NotificationsService], // عشان تستخدمه في modules تانية
+  exports: [NotificationsService], 
 })
 export class NotificationModule {}
