@@ -1,23 +1,21 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt';
-import { Notification, NotificationSchema } from './schema/notification.schema'
 import { NotificationsService } from './notification.service';
 import { NotificationsController } from './notification.controller';
-import { NotificationsGateway } from './notifications.gateway';
+import { AuthNotificationListener } from './listeners/auth-notification.listener';
+import { PushNotification } from './channels/push.notification';
+import { EmailNotification } from './channels/email.notification';
+import { NotificationFactory } from './factories/notification.factory';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Notification.name, schema: NotificationSchema },
-    ]),
-       JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY,  
-      signOptions: { expiresIn: '7d' },
-    })
+  imports: [],
+  providers: [
+    NotificationsService,
+    NotificationFactory,
+    EmailNotification,
+    PushNotification,
+    AuthNotificationListener,
   ],
-  providers: [NotificationsService, NotificationsGateway],
   controllers: [NotificationsController],
-  exports: [NotificationsService], 
+  exports: [NotificationsService],
 })
 export class NotificationModule {}
