@@ -17,7 +17,7 @@ export class AuthNotificationListener {
     const { email, fullName } = event;
 
     // choose notification type
-    const notification = this.notificationFactory.create('push');
+    const notification = this.notificationFactory.create('email');
 
     await notification.send(
       email,
