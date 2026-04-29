@@ -16,7 +16,7 @@ import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { generateToken } from 'src/common/utils/generate-token';
 import { RegisterDto } from './dto/register.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserCreatedEvent } from 'src/events/user-created.event';
+import { UserEvent } from 'src/events/user-created.event';
 import { AUTH_EVENTS } from 'src/events/user.events';
 
 @Injectable()
@@ -45,7 +45,7 @@ export class AuthService {
     const token = generateToken(user._id.toString(), this.jwtService);
       this.eventEmitter.emit(
      AUTH_EVENTS.USER_REGISTERED,
-    new UserCreatedEvent(
+    new UserEvent(
       user._id.toString(),
       user.email,
       user.fullName,
@@ -74,13 +74,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    // 4. JWT GENERATION
     const token = generateToken(user._id.toString(), this.jwtService);
+    this.eventEmitter.emit(
+  AUTH_EVENTS.USER_LOGGED_IN,
+  new UserEvent(
+    user._id.toString(),
+    user.email,
+    user.fullName,
+  ),
+);
 
     return UserResponseDto.fromEntity(user, token);
   }
 
-  // ── Forgot Password ────────────────────────────────────────
 
   async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await this.usersRepository.findByEmail(email);
@@ -100,7 +106,6 @@ export class AuthService {
     return { message: 'Reset code sent' };
   }
 
-  // ── Logout ─────────────────────────────────────────────────
 
   async logout(userId: string): Promise<{ message: string }> {
     const user = await this.usersRepository.findById(userId);
